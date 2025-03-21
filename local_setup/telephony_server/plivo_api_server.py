@@ -7,6 +7,7 @@ import redis.asyncio as redis
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import PlainTextResponse
 import plivo
+from pathlib import Path
 
 app = FastAPI()
 load_dotenv()
@@ -49,8 +50,16 @@ async def make_call(request: Request):
 
         if not call_details or "recipient_phone_number" not in call_details:
             raise HTTPException(status_code=404, detail="Recipient phone number not provided")
+        
+        env_path = Path(__file__).resolve().parent.parent / ".env"
 
-        telephony_host, bolna_host = populate_ngrok_tunnels()
+        # Load the .env file
+        load_dotenv(dotenv_path=env_path)
+
+        # telephony_host, bolna_host = populate_ngrok_tunnels()
+        telephony_host = os.getenv("TELEPHONY_HOST")
+        bolna_host = os.getenv("BOLNA_HOST")
+
 
         print(f'telephony_host: {telephony_host}')
         print(f'bolna_host: {bolna_host}')
